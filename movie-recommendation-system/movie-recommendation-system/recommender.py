@@ -15,10 +15,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 class MovieRecommender:
-    
-def __init__(self, data_path: str = None):
-    if data_path is None:
-        data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "movies.csv")        self.data_path = data_path
+    def __init__(self, data_path: str = None):
+        if data_path is None:
+            data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "movies.csv")
+        self.data_path = data_path
         self.df = pd.read_csv(data_path)
         self._prepare_data()
 
@@ -28,9 +28,6 @@ def __init__(self, data_path: str = None):
         for col in ["genres", "director", "cast", "overview"]:
             self.df[col] = self.df[col].fillna("")
 
-        # Weight genres and cast more by repeating them — this nudges
-        # recommendations towards similar genre/cast rather than only
-        # similar plot wording.
         self.df["soup"] = (
             (self.df["genres"] + " ") * 3
             + (self.df["cast"] + " ") * 2
@@ -58,8 +55,6 @@ def __init__(self, data_path: str = None):
         idx = self.title_to_index[key]
         scores = list(enumerate(self.similarity_matrix[idx]))
         scores = sorted(scores, key=lambda x: x[1], reverse=True)
-
-        # Skip index 0 result since it will always be the movie itself
         scores = [s for s in scores if s[0] != idx][:top_n]
 
         results = []
@@ -72,13 +67,3 @@ def __init__(self, data_path: str = None):
                 "similarity": round(float(score), 3),
             })
         return results
-
-
-if __name__ == "__main__":
-    engine = MovieRecommender()
-    movie = "Iron Circuit"
-    print(f"Recommendations for '{movie}':\n")
-    for rec in engine.recommend(movie, top_n=5):
-        print(f"- {rec['title']}  (score: {rec['similarity']})")
-        print(f"  Genres: {rec['genres']}")
-        print(f"  {rec['overview']}\n")
