@@ -8,14 +8,17 @@ cosine similarity.
 Author: You :)
 """
 
+import os
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
 class MovieRecommender:
-    def __init__(self, data_path: str = "data/movies.csv"):
-        self.data_path = data_path
+    
+def __init__(self, data_path: str = None):
+    if data_path is None:
+        data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "movies.csv")        self.data_path = data_path
         self.df = pd.read_csv(data_path)
         self._prepare_data()
 
